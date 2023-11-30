@@ -22,7 +22,6 @@ jobs:
       - name: Install gems
         run: |
           echo 'gem: --no-document' >> ~/.gemrc
-          bundle install
 
       - name: Build gem and publish to github package
         id: gemstep
