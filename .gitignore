@@ -1,1 +1,5 @@
 *.gem
+.yardoc/
+doc/
+lib/.DS_Store
+.DS_Store
