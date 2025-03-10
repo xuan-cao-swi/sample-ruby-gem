@@ -34,13 +34,13 @@ jobs:
 
       - name: Print checksums (in case some debugging is needed)
         run: |
-          echo "Gem version:       ${{ steps.build.outputs.gem_version }}"
+          echo "Gem version:       ${{ steps.gemstep.outputs.gem_version }}"
 
       - name: Upload to artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hola-xuan-${{ steps.build.outputs.gem_version }}.gem
-          path: hola-xuan-${{ steps.build.outputs.gem_version }}.gem
+          name: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
+          path: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
 
   # extract the built layer from artifacts, then scan it with reverselab
   reverselab_scan_gem:
