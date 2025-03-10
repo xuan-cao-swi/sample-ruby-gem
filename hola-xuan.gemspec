@@ -1,6 +1,10 @@
+
+$LOAD_PATH.push File.expand_path('lib', __dir__)
+require 'version'
+
 Gem::Specification.new do |s|
   s.name        = "hola-xuan"
-  s.version     = "0.1.3"
+  s.version     = Hello::STRING
   s.summary     = "Hola!"
   s.description = "A simple hello world gem"
   s.authors     = ["Xuan Cao"]
