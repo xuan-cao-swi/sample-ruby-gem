@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: extract current solarwinds_apm version
+      - name: extract current hola-xuan version
         id: extract
         run: |
           APM_VERSION=$(ruby -e 'require "./lib/version"; puts Hello::STRING')
@@ -62,7 +62,7 @@ jobs:
       - name: extract layer zip from artifacts
         uses: actions/download-artifact@v4
         with:
-          name: solarwinds_apm-${{ env.SOLARWINDS_APM_VERSION }}.gem
+          name: hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
           path: ./
 
       - name: Print checksums (in case some debugging is needed)
