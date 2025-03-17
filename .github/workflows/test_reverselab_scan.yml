@@ -9,6 +9,9 @@ jobs:
     name: Build + Release Gem to RubyGems
     runs-on: ubuntu-latest
 
+    outputs:
+      gem_version: ${{ steps.gemstep.outputs.gem_version }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -53,22 +56,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: extract current hola-xuan version
-        id: extract
-        run: |
-          APM_VERSION=$(ruby -e 'require "./lib/version"; puts Hello::STRING')
-          echo "SOLARWINDS_APM_VERSION=$APM_VERSION" >> $GITHUB_ENV
-
       - name: extract layer zip from artifacts
         uses: actions/download-artifact@v4
         with:
           name: hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
           path: ./
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
       - name: Print checksums (in case some debugging is needed)
         run: |
           echo "Gem version:       ${{ env.SOLARWINDS_APM_VERSION }}"
           ls -al
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
       - name: Scan build artifact on the Portal
         id: rl-scan
@@ -80,6 +81,8 @@ jobs:
           rl-portal-org: SolarWinds
           rl-portal-group: SaaS-Agents-SWO
           rl-package-url: solarwinds-apm-ruby/hola-xuan@${{ env.SOLARWINDS_APM_VERSION }}
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
       - name: report the scan status
         if: success() || failure()
