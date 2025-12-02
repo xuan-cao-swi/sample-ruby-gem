@@ -35,57 +35,57 @@ jobs:
         env:
           GITHUB_SECRET_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
 
-      # - name: Print checksums (in case some debugging is needed)
-      #   run: |
-      #     echo "Gem version:       ${{ steps.gemstep.outputs.gem_version }}"
+      - name: Print checksums (in case some debugging is needed)
+        run: |
+          echo "Gem version:       ${{ steps.gemstep.outputs.gem_version }}"
 
-      # - name: Upload to artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
-      #     path: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
+      - name: Upload to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
+          path: hola-xuan-${{ steps.gemstep.outputs.gem_version }}.gem
 
   # extract the built layer from artifacts, then scan it with reverselab
-  # reverselab_scan_gem:
-  #   needs:
-  #     - publish_to_ruby_gem
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
+  reverselab_scan_gem:
+    needs:
+      - publish_to_ruby_gem
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: extract layer zip from artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
-  #         path: ./
-  #       env:
-  #         SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
+      - name: extract layer zip from artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
+          path: ./
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
-  #     - name: Print checksums (in case some debugging is needed)
-  #       run: |
-  #         echo "Gem version:       ${{ env.SOLARWINDS_APM_VERSION }}"
-  #         ls -al
-  #       env:
-  #         SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
+      - name: Print checksums (in case some debugging is needed)
+        run: |
+          echo "Gem version:       ${{ env.SOLARWINDS_APM_VERSION }}"
+          ls -al
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
-  #     - name: Scan build artifact on the Portal
-  #       id: rl-scan
-  #       uses: reversinglabs/gh-action-rl-scanner-cloud-only@v1
-  #       with:
-  #         artifact-to-scan: ./hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
-  #         rl-verbose: true
-  #         rl-portal-server: solarwinds
-  #         rl-portal-org: SolarWinds
-  #         rl-portal-group: SaaS-Agents-SWO
-  #         rl-package-url: solarwinds-apm-ruby/hola-xuan@${{ env.SOLARWINDS_APM_VERSION }}
-  #       env:
-  #         SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
+      - name: Scan build artifact on the Portal
+        id: rl-scan
+        uses: reversinglabs/gh-action-rl-scanner-cloud-only@v1
+        with:
+          artifact-to-scan: ./hola-xuan-${{ env.SOLARWINDS_APM_VERSION }}.gem
+          rl-verbose: true
+          rl-portal-server: solarwinds
+          rl-portal-org: SolarWinds
+          rl-portal-group: SaaS-Agents-SWO
+          rl-package-url: solarwinds-apm-ruby/hola-xuan@${{ env.SOLARWINDS_APM_VERSION }}
+        env:
+          SOLARWINDS_APM_VERSION: ${{needs.publish_to_ruby_gem.outputs.gem_version}}
 
-  #     - name: report the scan status
-  #       if: success() || failure()
-  #       run: |
-  #         echo "The status is: '${{ steps.rl-scan.outputs.status }}'"
-  #         echo "The description is: '${{ steps.rl-scan.outputs.description }}'"
+      - name: report the scan status
+        if: success() || failure()
+        run: |
+          echo "The status is: '${{ steps.rl-scan.outputs.status }}'"
+          echo "The description is: '${{ steps.rl-scan.outputs.description }}'"
