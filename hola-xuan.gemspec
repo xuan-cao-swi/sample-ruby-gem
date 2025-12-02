@@ -1,3 +1,6 @@
+$LOAD_PATH.push File.expand_path('lib', __dir__)
+require 'version'
+
 Gem::Specification.new do |s|
   s.name        = "hola-xuan"
   s.version     = "0.1.4"
