@@ -1,7 +1,7 @@
 class Hello
-  MAJOR  = 6 # breaking,
+  MAJOR  = 0 # breaking,
   MINOR  = 1 # feature,
-  PATCH  = 2 # fix => BFF
+  PATCH  = 4 # fix => BFF
   PRE    = nil
 
   STRING = [MAJOR, MINOR, PATCH, PRE].compact.join('.')
