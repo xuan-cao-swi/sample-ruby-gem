@@ -6,6 +6,9 @@ name: Ruby Gem to Github Package
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+
 jobs:
   build:
     name: Build + Publish to Github Package
