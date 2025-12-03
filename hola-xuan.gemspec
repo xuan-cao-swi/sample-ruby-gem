@@ -3,7 +3,7 @@ require 'version'
 
 Gem::Specification.new do |s|
   s.name        = "hola-xuan"
-  s.version     = "0.1.4"
+  s.version     = Hello::STRING
   s.summary     = "Hola!"
   s.description = "A simple hello world gem"
   s.authors     = ["Xuan Cao"]

@@ -40,9 +40,6 @@ jobs:
       contents: write
       id-token: write
 
-    # If you configured a GitHub environment on RubyGems, you must use it here.
-    # environment: release
-
     steps:
       # Set up
       - uses: actions/checkout@v5
@@ -54,5 +51,44 @@ jobs:
           bundler-cache: true
           ruby-version: ruby
 
+      - name: Get gem version
+        id: build
+        run: |
+          echo "gem_version=`ruby -e 'require "./lib/version"; puts Hello::STRING'`" >> $GITHUB_OUTPUT
+
       # Release
       - uses: rubygems/release-gem@v1
+
+      - name: Calculate checksum
+        id: checksum_step
+        run: |
+          checksum=`shasum -a256 pkg/hola-xuan-${{ steps.build.outputs.gem_version }}.gem | awk '{print $1;}'`
+          echo "checksum: $checksum"
+          echo "checksum=$checksum" >> $GITHUB_OUTPUT
+          # Copy gem to root for artifact upload
+          cp pkg/hola-xuan-${{ steps.build.outputs.gem_version }}.gem .
+
+      - name: Get checksum from Rubygems
+        id: checksum
+        run: |
+          gem_version=${{ steps.build.outputs.gem_version }}
+          echo "geminfo=`curl https://rubygems.org/api/v2/rubygems/hola-xuan/versions/$gem_version.json`" >> $GITHUB_OUTPUT
+
+      - name: Print checksums (in case some debugging is needed)
+        run: |
+          echo "local checksum:    ${{ steps.checksum_step.outputs.checksum }}"
+          echo "Rubygems checksum: ${{ fromJson(steps.checksum.outputs.geminfo).sha }}"
+          echo "Gem version:       ${{ steps.build.outputs.gem_version }}"
+
+      - name: Fail if local and rubygems checksums don't match
+        if: fromJson(steps.checksum.outputs.geminfo).sha != steps.checksum_step.outputs.checksum
+        run: |
+          echo "local and rubygems checksum not matching, gem needs to be yanked from rubygems.org"
+          exit 1
+
+      - name: Upload to artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: hola-xuan-${{ steps.build.outputs.gem_version }}.gem
+          path: hola-xuan-${{ steps.build.outputs.gem_version }}.gem
+
