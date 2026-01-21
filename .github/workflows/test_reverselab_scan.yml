@@ -1,4 +1,4 @@
-name: Ruby Gem to RubyGems
+name: Test Reverse Lab Scan
 
 on:
   workflow_dispatch:

@@ -45,7 +45,7 @@ jobs:
           chmod 0600 ~/.gem/credentials
           gem push --key github --host https://rubygems.pkg.github.com/xuan-cao-swi pkg/hola-xuan-${{ steps.version.outputs.gem_version }}.gem
         env:
-          GITHUB_SECRET_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SECRET_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
 
       - name: Upload to artifact
         uses: actions/upload-artifact@v6
