@@ -7,12 +7,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  publish_to_github_package:
     name: Build + Publish to Github Package
     runs-on: ubuntu-latest
 
+    outputs:
+      gem_version: ${{ steps.version.outputs.gem_version }}
+
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set up Ruby 3.1 and bundle
         uses: ruby/setup-ruby@v1
@@ -22,11 +25,30 @@ jobs:
       - name: Install gems
         run: |
           echo 'gem: --no-document' >> ~/.gemrc
+          bundle install
 
-      - name: Build gem and publish to github package
+      - name: Build gem
+        run: bundle exec rake build
+
+      - name: Extract version from built gem
+        id: version
+        run: |
+          GEM_FILE=$(ls pkg/hola-xuan-*.gem | head -1)
+          VERSION=$(basename "$GEM_FILE" .gem | sed 's/hola-xuan-//')
+          echo "gem_version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Publish to github package
         id: gemstep
         run:  |
-          gem build hola-xuan.gemspec
-          gem push hola-xuan-0.1.4.gem
+          mkdir -p ~/.gem
+          echo -e "---\n:github: Bearer $GITHUB_SECRET_TOKEN" >> ~/.gem/credentials
+          chmod 0600 ~/.gem/credentials
+          gem push --key github --host https://rubygems.pkg.github.com/xuan-cao-swi pkg/hola-xuan-${{ steps.version.outputs.gem_version }}.gem
         env:
-          GITHUB_SECRET_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
+          GITHUB_SECRET_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: hola-xuan-${{ steps.version.outputs.gem_version }}.gem
+          path: pkg/hola-xuan-${{ steps.version.outputs.gem_version }}.gem
