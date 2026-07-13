@@ -29,6 +29,11 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
+    
+      - name: Check git status
+        run: |
+          git status
+          git --no-pager diff
 
       - name: Open release pull request
         env:
