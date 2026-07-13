@@ -1,0 +1,27 @@
+# This file controls the toys-release gem.
+
+# The repo organization and name.
+repo: xuan-cao-swi/sample-ruby-gem
+
+# Disable pre-release GitHub check requirements.
+required_checks: false
+
+# If commits are added while release pull requests are open, update those pull
+# requests to reflect the new commits.
+update_existing_requests: true
+
+# Git user attached to commits for release pull requests.
+git_user_name: github-actions[bot]
+git_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+
+# Use "-" for changelog bullet points (markdownlint / prettier compliant).
+changelog_bullet: "-"
+
+changelog_release_header_format: "## v%v / %Y-%m-%d"
+
+# List of all releasable gems in this repository.
+gems:
+  - name: hola-xuan
+    directory: "."
+    version_rb_path: lib/version.rb
+    changelog_path: CHANGELOG.md

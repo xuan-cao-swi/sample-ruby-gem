@@ -1,0 +1,35 @@
+name: "[release hook] Update open releases"
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  release-update-open-requests:
+    if: ${{ github.repository == 'xuan-cao-swi/sample-ruby-gem' }}
+    permissions:
+      contents: write # required for updating releases
+      pull-requests: write # required for updating release PRs
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/.toys/release/Gemfile
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.1"
+          bundler-cache: true
+
+      - name: Update open releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bundle exec toys release _onpush --verbose \
+            < /dev/null

@@ -1,8 +1,9 @@
 class Hello
-  MAJOR  = 0 # breaking,
-  MINOR  = 1 # feature,
-  PATCH  = 6 # fix => BFF
-  PRE    = nil
+  # Single source of truth for the gem version. This constant is read and
+  # updated automatically by the toys-release tooling, so it must stay in the
+  # `VERSION = "x.y.z"` string form.
+  VERSION = '0.1.6'
 
-  STRING = [MAJOR, MINOR, PATCH, PRE].compact.join('.')
+  # Backwards-compatible alias used by the gemspec and existing workflows.
+  STRING = VERSION
 end

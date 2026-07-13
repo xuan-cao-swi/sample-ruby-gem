@@ -3,3 +3,6 @@
 doc/
 lib/.DS_Store
 .DS_Store
+
+# Vendored gems
+**/vendor/**/*
