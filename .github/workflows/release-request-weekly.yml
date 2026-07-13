@@ -1,0 +1,36 @@
+name: Open release request - Weekly
+
+on:
+  schedule:
+    - cron: "0 15 * * 2"
+
+permissions:
+  contents: read
+
+jobs:
+  release-request:
+    if: ${{ github.repository == 'xuan-cao-swi/sample-ruby-gem' }}
+    permissions:
+      contents: write # required for creating releases
+      pull-requests: write # required for creating release PRs
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/.toys/release/Gemfile
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Open release pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_BRANCH: ${{ github.ref }}
+        run: |
+          bundle exec toys release request --yes --verbose \
+            "--target-branch=$TARGET_BRANCH" \
+            < /dev/null
