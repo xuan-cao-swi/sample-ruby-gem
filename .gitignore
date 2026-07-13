@@ -6,3 +6,5 @@ lib/.DS_Store
 
 # Vendored gems
 **/vendor/**/*
+
+.github/workflows/release-request-weekly.yml
