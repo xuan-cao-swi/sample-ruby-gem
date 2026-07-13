@@ -22,8 +22,6 @@ jobs:
       pull-requests: write # required for updating label on PR, posting comments
       issues: write # required for creating new issues on failed releases
     runs-on: ubuntu-latest
-    env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/.toys/release/Gemfile
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -32,7 +30,9 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
-          bundler-cache: true
+
+      - name: Install Toys
+        run: gem install --no-document toys:0.22.0 toys-release:0.9.1
 
       - name: Retry release
         env:
@@ -41,7 +41,7 @@ jobs:
           RELEASE_FLAGS: ${{ github.event.inputs.flags }}
           RELEASE_PR: ${{ github.event.inputs.release_pr }}
         run: |
-          bundle exec toys release retry --yes --verbose \
+          toys release retry --yes --verbose \
             $RELEASE_FLAGS \
             "$RELEASE_PR" \
             < /dev/null
