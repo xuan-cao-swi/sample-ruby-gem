@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       names:
-        description: Components to release (leave blank to release all components)
+        description: >-
+          Leave blank to auto-release based on conventional commits (feat:/fix:/docs:) since the last tag.
+          To force a release regardless of commit messages, use "hola-xuan=patch" (or minor/major/<exact version>).
         required: false
         default: ""
 
