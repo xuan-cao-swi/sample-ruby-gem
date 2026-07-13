@@ -1,3 +1,3 @@
 git add .
-git commit -m 'fix: fix release workflow'
+git commit -m 'chore: update'
 git push origin main
