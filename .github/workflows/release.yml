@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: >-
+      ${{ github.repository == 'xuan-cao-swi/sample-ruby-gem' &&
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'release: pending') }}
+    permissions:
+      contents: write # required for creating the GitHub release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          persist-credentials: false
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Determine version
+        id: version
+        run: |
+          version="$(ruby -Ilib -rversion -e 'puts Hello::STRING')"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build gem
+        run: gem build hola-xuan.gemspec
+
+      - name: Publish gem to RubyGems
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gem push "hola-xuan-${VERSION}.gem"
+
+      - name: Extract release notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v version="v${VERSION}" '
+            $0 ~ "^## " version { flag=1; next }
+            /^## v/ { flag=0 }
+            flag { print }
+          ' CHANGELOG.md > release-notes.md
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v${VERSION}" \
+            --title "hola-xuan v${VERSION}" \
+            --notes-file release-notes.md \
+            --target "${{ github.event.pull_request.base.ref }}"
